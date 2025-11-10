@@ -65,11 +65,6 @@ try:
           |
     =========''']
 
-    WORDS = [
-        "python", "javascript", "programming", "github", "copilot", "developer",
-        "socket", "network", "server", "client", "hangman", "terminal"
-    ]
-
     def get_game_state(word, guessed_letters, tries):
         """Constructs the display string for the current game state."""
         display = HANGMAN_PICS[6 - tries]
@@ -87,7 +82,7 @@ try:
 
     def run_server_game(conn):
         """Server-side game loop."""
-        word = random.choice(WORDS)
+        word = input("Enter the word to be guessed (letters only): ").lower().strip()
         guessed_letters = set()
         tries = 6
         game_over = False
@@ -95,8 +90,14 @@ try:
         print(f"Game started. The word is '{word}'.")
 
         while not game_over:
-            # Send current state to client
+            # Construct and display current state on server
             state_msg = get_game_state(word, guessed_letters, tries)
+            print("\n" + "="*20)
+            print(state_msg)
+            print("="*20)
+            print("Waiting for client's guess...")
+
+            # Send current state to client
             conn.sendall(state_msg.encode())
 
             # Wait for a guess from the client
@@ -106,6 +107,7 @@ try:
                     print("\n[Client disconnected]")
                     break
                 guess = data.decode().lower().strip()
+                print(f"Client guessed: '{guess}'")
             except ConnectionResetError:
                 print("\n[Client disconnected]")
                 break
@@ -114,21 +116,28 @@ try:
             if len(guess) == 1 and guess.isalpha():
                 if guess in guessed_letters:
                     # Letter already guessed, do nothing
+                    print("Client guessed a letter they already tried.")
                     pass
                 elif guess in word:
                     guessed_letters.add(guess)
+                    print("Correct guess!")
                 else:
                     guessed_letters.add(guess)
                     tries -= 1
+                    print("Incorrect guess.")
+            else:
+                print("Client sent an invalid guess.")
             
             # Check for win/loss
             won = all(letter in guessed_letters for letter in word)
             if won:
                 final_msg = f"\nCongratulations! You guessed the word: {word}"
+                print("\nClient won!")
                 conn.sendall(final_msg.encode())
                 game_over = True
             elif tries == 0:
                 final_msg = f"\nGame Over! The word was: {word}"
+                print("\nClient lost!")
                 conn.sendall(final_msg.encode())
                 game_over = True
         
