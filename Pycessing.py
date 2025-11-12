@@ -45,12 +45,13 @@ _screen = None  # The main display surface
 _visual_output = None
 
 def setup(TITLE:str, WIDTH:int = None, HEIGHT:int = None, framerate:int = 60) -> None:
-    global _screen, width, height, hasSetup, _framerate
+    global _screen, width, height, hasSetup, _framerate, _visual_output
     """
     This function is used to configure the initial settings of the Pycessing environment.
     """
     if WIDTH is None and HEIGHT is None:
         _screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
+        _visual_output = _screen
         canvas.width = pygame.display.Info().current_w
         canvas.height = pygame.display.Info().current_h
     else:
@@ -326,14 +327,18 @@ try:
 
     # --- Helper Functions ---
 
+    def validate_visual_output() -> None:
+        global _visual_output, _screen
+        _visual_output = _visual_output if _visual_output is not None else _screen
+
     def switch_visual_output(surface:pygame.Surface = None) -> None:
         """
         Switches the current visual output surface.
         Args:
             surface: The new surface to draw on.
         """
-        global _visual_output
-        _visual_output = surface or _screen
+        global _visual_output, _screen
+        _visual_output = surface if surface is not None else _screen
 
     def _convert_color(color) -> tuple[int, int, int]:
         """
@@ -404,6 +409,7 @@ try:
             _background_color = _convert_color((args[0], args[1], args[2]))
         else:
             raise ValueError(f"Invalid background arguments: {args}")
+        validate_visual_output()
         _visual_output.fill(_background_color)
 
     def size(w, h) -> None:
@@ -419,7 +425,8 @@ try:
         height = h
         _screen = pygame.display.set_mode((w, h))
         # Preserve the old background by redrawing it after resizing.
-        _screen.fill(_background_color)  # Redraw the previous background color.
+        validate_visual_output()
+        _visual_output.fill(_background_color)  # Redraw the previous background color.
 
     def fill(*args) -> tuple[int, int, int]:
         """
@@ -1194,7 +1201,6 @@ try:
             if not scrolled:
                 mouse.scrolled = 0
 
-            # _visual_output.fill(_background_color)  # Clear the background each frame
             draw_func()
             pygame.display.flip()
             pygame.time.Clock().tick(_framerate)  # Cap frame rate at 60 FPS (adjust as needed)
