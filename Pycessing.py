@@ -327,11 +327,11 @@ try:
 
     # --- Helper Functions ---
 
-    def validate_visual_output() -> None:
+    def validateVisualOutput() -> None:
         global _visual_output, _screen
         _visual_output = _visual_output if _visual_output is not None else _screen
 
-    def switch_visual_output(surface:pygame.Surface = None) -> None:
+    def switchVisualOutput(surface:pygame.Surface = None) -> None:
         """
         Switches the current visual output surface.
         Args:
@@ -409,7 +409,7 @@ try:
             _background_color = _convert_color((args[0], args[1], args[2]))
         else:
             raise ValueError(f"Invalid background arguments: {args}")
-        validate_visual_output()
+        validateVisualOutput()
         _visual_output.fill(_background_color)
 
     def size(w, h) -> None:
@@ -425,7 +425,7 @@ try:
         height = h
         _screen = pygame.display.set_mode((w, h))
         # Preserve the old background by redrawing it after resizing.
-        validate_visual_output()
+        validateVisualOutput()
         _visual_output.fill(_background_color)  # Redraw the previous background color.
 
     def fill(*args) -> tuple[int, int, int]:
