@@ -42,6 +42,7 @@ canvas = Canvas(0, 0)  # Default size
 _start_time = int(time.time() * 1000)  # Start time in milliseconds
 _framerate = 60  # Default frame rate
 _screen = None  # The main display surface
+_visual_output = None
 
 def setup(TITLE:str, WIDTH:int = None, HEIGHT:int = None, framerate:int = 60) -> None:
     global _screen, width, height, hasSetup, _framerate
@@ -54,6 +55,7 @@ def setup(TITLE:str, WIDTH:int = None, HEIGHT:int = None, framerate:int = 60) ->
         canvas.height = pygame.display.Info().current_h
     else:
         _screen = pygame.display.set_mode((WIDTH, HEIGHT), pygame.RESIZABLE)
+        _visual_output = _screen
         canvas.width = WIDTH
         canvas.height = HEIGHT
     pygame.display.set_caption(TITLE)
@@ -324,6 +326,15 @@ try:
 
     # --- Helper Functions ---
 
+    def switch_visual_output(surface:pygame.Surface = None) -> None:
+        """
+        Switches the current visual output surface.
+        Args:
+            surface: The new surface to draw on.
+        """
+        global _visual_output
+        _visual_output = surface or _screen
+
     def _convert_color(color) -> tuple[int, int, int]:
         """
         Converts various color formats to RGB tuples.
@@ -393,7 +404,7 @@ try:
             _background_color = _convert_color((args[0], args[1], args[2]))
         else:
             raise ValueError(f"Invalid background arguments: {args}")
-        _screen.fill(_background_color)
+        _visual_output.fill(_background_color)
 
     def size(w, h) -> None:
         """
@@ -542,9 +553,9 @@ try:
         x, y, width, height = _handle_rect_mode(x, y, width, height)
 
         if not _no_fill:
-            pygame.draw.rect(_screen, _fill_color, (x, y, width, height), border_radius=corner_radius)
+            pygame.draw.rect(_visual_output, _fill_color, (x, y, width, height), border_radius=corner_radius)
         if not (_no_stroke or _stroke_weight == 0):
-            pygame.draw.rect(_screen, _stroke_color, (x, y, width, height), _stroke_weight, border_radius=corner_radius)
+            pygame.draw.rect(_visual_output, _stroke_color, (x, y, width, height), _stroke_weight, border_radius=corner_radius)
 
     def ellipse(x:int, y:int, a:int, b:int):
         """
@@ -558,9 +569,9 @@ try:
         """
         x, y, a, b = _handle_ellipse_mode(x, y, a, b)
         if not _no_fill:
-            pygame.draw.ellipse(_screen, _fill_color, (x, y, a, b))
+            pygame.draw.ellipse(_visual_output, _fill_color, (x, y, a, b))
         if not _no_stroke:
-            pygame.draw.ellipse(_screen, _stroke_color, (x, y, a, b), _stroke_weight)
+            pygame.draw.ellipse(_visual_output, _stroke_color, (x, y, a, b), _stroke_weight)
 
     def circle(x:int, y:int, r:int):
         """
@@ -618,7 +629,7 @@ try:
             y3: The y-coordinate of the third control point.
         """
         if not _no_stroke:
-            pygame.draw.lines(_screen, _fill_color, False, curve((x1,y1), (x2, y2), (x3, y3)), width=_stroke_weight)
+            pygame.draw.lines(_visual_output, _fill_color, False, curve((x1,y1), (x2, y2), (x3, y3)), width=_stroke_weight)
             
 
     def line(x1:int, y1:int, x2:int, y2:int, endcaps:bool=False):
@@ -632,11 +643,11 @@ try:
             y2: The y-coordinate of the second point.
         """
         if not _no_stroke:
-            pygame.draw.line(_screen, _stroke_color, (x1, y1), (x2, y2), _stroke_weight)
+            pygame.draw.line(_visual_output, _stroke_color, (x1, y1), (x2, y2), _stroke_weight)
             if endcaps:
                 radius = _stroke_weight // 2
-                pygame.draw.circle(_screen, _stroke_color, (x1, y1), radius)
-                pygame.draw.circle(_screen, _stroke_color, (x2, y2), radius)
+                pygame.draw.circle(_visual_output, _stroke_color, (x1, y1), radius)
+                pygame.draw.circle(_visual_output, _stroke_color, (x2, y2), radius)
 
     def point(x:int, y:int):
         """
@@ -648,7 +659,7 @@ try:
         """
         if not _no_stroke:
             # Pygame doesn't have a single-pixel point, so we draw a tiny rect.
-            pygame.draw.rect(_screen, _stroke_color, (x, y, _stroke_weight, _stroke_weight))
+            pygame.draw.rect(_visual_output, _stroke_color, (x, y, _stroke_weight, _stroke_weight))
 
 
 
@@ -666,9 +677,9 @@ try:
         """
         points = [(x1, y1), (x2, y2), (x3, y3)]
         if not _no_fill:
-            pygame.draw.polygon(_screen, _fill_color, points)
+            pygame.draw.polygon(_visual_output, _fill_color, points)
         if not _no_stroke:
-            pygame.draw.polygon(_screen, _stroke_color, points, _stroke_weight)
+            pygame.draw.polygon(_visual_output, _stroke_color, points, _stroke_weight)
 
     def quad(x1:int, y1:int, x2:int, y2:int, x3:int, y3:int, x4:int, y4:int):
         """
@@ -686,9 +697,9 @@ try:
         """
         points = [(x1, y1), (x2, y2), (x3, y3), (x4, y4)]
         if not _no_fill:
-            pygame.draw.polygon(_screen, _fill_color, points)
+            pygame.draw.polygon(_visual_output, _fill_color, points)
         if not _no_stroke:
-            pygame.draw.polygon(_screen, _stroke_color, points, _stroke_weight)
+            pygame.draw.polygon(_visual_output, _stroke_color, points, _stroke_weight)
     # --- Text Functions ---
     _font_name:str= 'C:/Windows/Fonts/calibri.ttf'
     _font:pygame.font.Font = pygame.font.Font('C:/Windows/Fonts/calibri.ttf', 12)
@@ -736,7 +747,7 @@ try:
 
         text_surface = _font.render(string, True, _fill_color)  # Use _fill_color for text
         # correct the alignment based on _text_horizontal_align and _text_vertical_align
-        _screen.blit(text_surface, (
+        _visual_output.blit(text_surface, (
             x - text_surface.get_width() // 2 if _text_horizontal_align == "CENTER" else
             x - text_surface.get_width() if _text_horizontal_align == "RIGHT" else x,
             y - text_surface.get_height() // 2 if _text_vertical_align == "CENTER" else
@@ -1032,7 +1043,7 @@ try:
         if flipX or flipY:
             draw_img = pygame.transform.flip(draw_img, flipX, flipY)
 
-        _screen.blit(draw_img, (x, y))
+        _visual_output.blit(draw_img, (x, y))
 
     # --- Sound functions ---
     def load_sound(filename):
@@ -1183,7 +1194,7 @@ try:
             if not scrolled:
                 mouse.scrolled = 0
 
-            # _screen.fill(_background_color)  # Clear the background each frame
+            # _visual_output.fill(_background_color)  # Clear the background each frame
             draw_func()
             pygame.display.flip()
             pygame.time.Clock().tick(_framerate)  # Cap frame rate at 60 FPS (adjust as needed)
