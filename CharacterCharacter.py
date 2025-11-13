@@ -84,6 +84,7 @@ def draw():
     canvas.screen.blit(frontScreen, (0,0))    
 
 def eventHandler(event: pygame.event.Event):
+    global chars
     switchVisualOutput(backScreen)
     try:
         if event.type == pygame.KEYDOWN:
