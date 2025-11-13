@@ -10,9 +10,11 @@ frontScreen:pygame.Surface = pygame.Surface((canvas.width, canvas.height), pygam
 frontScreen.fill((0,0,0,0))
 
 brushSize = 20
+drew:int = 0
+chars = ''
 
 def draw():
-    global brushSize
+    global brushSize, drew, chars
     switchVisualOutput(backScreen) # Make sure we are editing the background.
     frontScreen.fill((0,0,0,0)) # Make sure the stuff changing each frame is reset.
 
@@ -22,9 +24,11 @@ def draw():
         if mouse.left:
             fill(255)
             circle(mouse.x, mouse.y, brushSize)
+            drew = 1
         if mouse.right:
             fill(0)
             circle(mouse.x, mouse.y, brushSize)
+            drew = -1
 
     # Update brushSize based on mouse scrolling.
     brushSize = max(1, brushSize + mouse.scrolled)
@@ -39,14 +43,39 @@ def draw():
     circle(mouse.x, mouse.y, brushSize-1)
 
     # Send the current mouse position and brush size to the other client.
-    TwoWay.send(f"{mouse.x},{mouse.y},{brushSize}")
+    TwoWay.send(f"{mouse.x},{mouse.y},{brushSize},{drew},{chars}")
+    # Reset chars and drew after sending.
+    chars = ''
+    drew = 0
+
     data = TwoWay.check()
     if data != "":
         try:
-            x, y, bSize = map(int, data.split(","))
+            x, y, bSize, drewReceived = map(int, data.split(",")[0:4])
+            chrs = data.split(",")[4].split('')
+            for c in chrs:
+                if c != '':
+                    switchVisualOutput(backScreen)
+                    textSize(bSize*2)
+                    textAlign("center", "center")
+                    fill(255)
+                    text(c, x, y)
+
             noFill()
             stroke(255, 0, 0)
             circle(x, y, bSize)
+            match drewReceived:
+                case 1:
+                    switchVisualOutput(backScreen)
+                    noStroke()
+                    fill(255)
+                    circle(x, y, bSize)
+                case -1:
+                    switchVisualOutput(backScreen)
+                    noStroke()
+                    fill(0)
+                    circle(x, y, bSize)
+
         except Exception as e:
             print(e)
 
@@ -64,6 +93,7 @@ def eventHandler(event: pygame.event.Event):
             textAlign("center", "center")
             fill(255)
             text(event.unicode, mouse.x, mouse.y)
+            chars = chars + event.unicode
     except Exception as e:
         print(e)
 
@@ -75,3 +105,4 @@ except Exception as e:
     print(e)
 finally:
     input()
+    TwoWay.thread.join()
