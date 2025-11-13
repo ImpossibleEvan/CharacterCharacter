@@ -1,7 +1,7 @@
 from Isopalia import *
 import TwoWay
 
-setup("CharacterCharacter", 400, 400)
+setup("CharacterCharacter")
 background(0)
 
 backScreen:pygame.Surface = pygame.Surface((canvas.width, canvas.height))
@@ -43,7 +43,7 @@ def draw():
     circle(mouse.x, mouse.y, brushSize-1)
 
     # Send the current mouse position and brush size to the other client.
-    TwoWay.send(f"{mouse.x},{mouse.y},{brushSize},{drew},{chars}")
+    TwoWay.send(f"{mouse.x};{mouse.y};{brushSize};{drew};{' '.join(chars)}")
     # Reset chars and drew after sending.
     chars = ''
     drew = 0
@@ -51,8 +51,8 @@ def draw():
     data = TwoWay.check()
     if data != "":
         try:
-            x, y, bSize, drewReceived = map(int, data.split(",")[0:4])
-            chrs = data.split(",")[4].split()
+            x, y, bSize, drewReceived = map(int, data.split(";")[0:4])
+            chrs = data.split(";")[4].split(' ')
             for c in chrs:
                 if c != '':
                     switchVisualOutput(backScreen)
@@ -90,11 +90,12 @@ def eventHandler(event: pygame.event.Event):
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_ESCAPE:
                 quit()
-            textSize(brushSize*2)
-            textAlign("center", "center")
-            fill(255)
-            text(event.unicode, mouse.x, mouse.y)
-            chars = chars + event.unicode
+            if event.unicode != ';':
+                textSize(brushSize*2)
+                textAlign("center", "center")
+                fill(255)
+                text(event.unicode, mouse.x, mouse.y)
+                chars = chars + event.unicode
     except Exception as e:
         print(e)
 
