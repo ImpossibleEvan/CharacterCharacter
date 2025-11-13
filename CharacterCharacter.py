@@ -96,6 +96,9 @@ def eventHandler(event: pygame.event.Event):
                 fill(255)
                 text(event.unicode, mouse.x, mouse.y)
                 chars = chars + event.unicode
+            else:
+                pass
+                # startprompt()
     except Exception as e:
         print(e)
 
