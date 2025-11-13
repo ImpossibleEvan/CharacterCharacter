@@ -1,6 +1,24 @@
 import socket
+import time
 
-def main():
+message = "" # thing sent
+data = "" # thing received
+pdata = "" # previous thing received
+
+def send(msg) -> None:
+    global message
+    message = msg
+
+def check() -> str:
+    global data
+    return data
+
+def uniqueCheck() -> str:
+    global data, pdata
+    return data if data != pdata else ""
+
+def main() -> None:
+    global data, pdata
     # Create a TCP/IP socket
     server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
@@ -23,11 +41,11 @@ def main():
         data = conn.recv(1024).decode()
         if not data:
             break
-        print(f"Client: {data}")
-
-        # Send a reply back to the client
-        reply = input("Server: ")
+        
+        pdata = data
+        reply = message
         conn.sendall(reply.encode())
+        time.sleep(0.01) 
 
     conn.close()
 

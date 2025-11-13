@@ -1,7 +1,7 @@
 from Isopalia import *
+import TwoWay
 
-
-setup("CharacterCharacter")
+setup("CharacterCharacter", 400, 400)
 background(0)
 
 backScreen:pygame.Surface = pygame.Surface((canvas.width, canvas.height))
@@ -12,6 +12,7 @@ frontScreen.fill((0,0,0,0))
 brushSize = 20
 
 def draw():
+    global brushSize
     switchVisualOutput(backScreen) # Make sure we are editing the background.
     frontScreen.fill((0,0,0,0)) # Make sure the stuff changing each frame is reset.
 
@@ -31,28 +32,45 @@ def draw():
     # Draw a circle the size of the brush to show where it will be draw.
     switchVisualOutput(frontScreen)
     noFill()
-    stroke(255)
     strokeWeight(1)
+    stroke(255)
     circle(mouse.x, mouse.y, brushSize)
+    stroke(0)
+    circle(mouse.x, mouse.y, brushSize-1)
+
+    # Send the current mouse position and brush size to the other client.
+    TwoWay.send(f"{mouse.x},{mouse.y},{brushSize}")
+    data = TwoWay.check()
+    if data != "":
+        try:
+            x, y, bSize = map(int, data.split(","))
+            noFill()
+            stroke(255, 0, 0)
+            circle(x, y, bSize)
+        except Exception as e:
+            print(e)
 
     # Draw the non-updating background and updating foreground.
-    canvas.screen.blit(backScreen)
-    canvas.screen.blit(frontScreen)
+    canvas.screen.blit(backScreen, (0,0))
+    canvas.screen.blit(frontScreen, (0,0))    
 
 def eventHandler(event: pygame.event.Event):
+    switchVisualOutput(backScreen)
     try:
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_ESCAPE:
                 quit()
-            textSize(canvas.width//20)
+            textSize(brushSize*2)
             textAlign("center", "center")
             fill(255)
-            text(chr(event.key), mouse.x, mouse.y)
+            text(event.unicode, mouse.x, mouse.y)
     except Exception as e:
         print(e)
 
+start(draw, nothing, eventHandler)
+
 try:
-    start(draw, nothing, eventHandler)
+    pass
 except Exception as e:
     print(e)
 finally:
