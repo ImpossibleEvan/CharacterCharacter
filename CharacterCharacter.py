@@ -52,7 +52,7 @@ def draw():
     if data != "":
         try:
             x, y, bSize, drewReceived = map(int, data.split(",")[0:4])
-            chrs = data.split(",")[4].split('')
+            chrs = data.split(",")[4].split()
             for c in chrs:
                 if c != '':
                     switchVisualOutput(backScreen)
