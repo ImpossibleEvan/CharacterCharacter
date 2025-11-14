@@ -84,6 +84,25 @@ try:
     _offset_x:int = 0
     _offset_y:int = 0
 
+    class COLOR:
+        RED = (255, 0, 0)
+        ORANGE = (255, 128, 0)
+        YELLOW = (255, 255, 0)
+        GREEN = (0, 255, 0)
+        JADE = (0, 255, 128)
+        CYAN = (0, 255, 255)
+        BLUE = (0, 0, 255)
+        PURPLE = (128, 0, 255)
+        MAGENTA = (255, 0, 255)
+
+        @staticmethod
+        def LIGHT(color:tuple[int, int, int]) -> tuple[int, int, int]:
+            return tuple(min(c + (255 - c)/2, 255) for c in color)
+
+        @staticmethod
+        def DARK(color:tuple[int, int, int]) -> tuple[int, int, int]:
+            return tuple(max(c / 2, 0) for c in color)
+
     # Stores pygame's key object as a local variable (the thing with key code constants)
     class K:
         """Class to handle key constants."""
@@ -522,6 +541,27 @@ try:
         Returns the current stroke weight.
         """
         return _stroke_weight
+
+    def style(fillColor:tuple|int = None, strokeColor:tuple|int = None, strokeThickness:int = None) -> tuple[tuple[int, int, int], tuple[int, int, int], int]:
+        """
+        Sets multiple style properties at once.
+
+        Args:
+            fillColor: The fill color. Can be an RGB tuple, grayscale value, or hex string.
+            strokeColor: The stroke color. Can be an RGB tuple, grayscale value, or hex string.
+            strokeThickness: The stroke weight (thickness) in pixels.
+        """
+
+        ret = (getFill(), getStroke(), getStrokeWeight())
+
+        if fillColor is not None:
+            fill(fillColor)
+        if strokeColor is not None:
+            stroke(strokeColor)
+        if strokeThickness is not None:
+            strokeWeight(strokeThickness)
+
+        return ret
 
     def rectMode(mode:str) -> None:
         """

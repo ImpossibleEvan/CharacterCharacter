@@ -1,9 +1,10 @@
+from concurrent.futures import thread
 import socket
+import threading
 import time
 
 message = "" # thing sent
 data = "" # thing received
-pdata = "" # previous thing received
 
 def send(msg) -> None:
     global message
@@ -13,32 +14,43 @@ def check() -> str:
     global data
     return data
 
-def uniqueCheck() -> str:
-    global data, pdata
-    return data if data != pdata else ""
+def myIP() -> str:
+    hostname = socket.gethostname()
+    ip = socket.gethostbyname(hostname)
+    return ip
 
 def main() -> None:
-    global data, pdata
-    # Create a TCP/IP socket
-    client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-
-    # Connect to the server (replace with the server's IP address)
-    client_socket.connect((input("Enter server IP address: "), int("5000" or input("Enter server port: "))))
-
-    print("Connected to the server.")
+    global data, pdata, clientSocket
 
     while True:
         reply = message
-        client_socket.sendall(reply.encode())
+        clientSocket.sendall(reply.encode())
 
         pdata = data
-        data = client_socket.recv(1024).decode()
+        data = clientSocket.recv(1024).decode()
         if not data:
             break
 
         time.sleep(0.01) 
 
-    client_socket.close()
+    clientSocket.close()
 
-if __name__ == "__main__":
-    main()
+def setup() -> None:
+    global mainThread, clientSocket
+    
+    # Create a TCP/IP socket
+    clientSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    # Connect to the server (replace with the server's IP address)
+    while True:
+        try:
+            clientSocket.connect((input("Enter server IP address: "), int("5000" or input("Enter server port: "))))
+            print("Connected to the server.")
+            break
+        except ConnectionRefusedError as e:
+            print(f"Do not attempt connection until server is ready.")
+            input("Press Enter to retry...")
+
+    # ^^^ Must happen before starting the thread ^^^
+
+    mainThread = threading.Thread(target=main, daemon=True)
+    mainThread.start()
