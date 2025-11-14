@@ -46,7 +46,7 @@ def networkHander() -> tuple:
             infos.append(msg)
 
         # Add own data
-        infos.append(f"{mouse.x};{mouse.y};{brushSize};{drew};`{' '.join(chars)}")
+        infos.append(f"{mouse.x};{mouse.y};{brushSize};{drew};`{chars}")
 
         outSignal = ';;'.join(infos)
 
@@ -59,7 +59,7 @@ def networkHander() -> tuple:
         for msg in data.split(';;'):
             infos.append(msg)
 
-        outSignal = f"{mouse.x};{mouse.y};{brushSize};{drew};`{' '.join(chars)}"
+        outSignal = f"{mouse.x};{mouse.y};{brushSize};{drew};`{chars}"
 
         client.send(outSignal)
 
