@@ -91,9 +91,10 @@ def draw():
     infos:list[str] = networkHander()    
 
     # Process all received infos.
-    for info in infos:
+    for i, info in enumerate(infos):
         if info != "":
             try:
+                text(str(info), canvas.width/2, 25 + (i*15))
                 args = info.split(";")
                 x = int(args[0])
                 y = int(args[1])
