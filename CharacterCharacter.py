@@ -65,7 +65,7 @@ def networkHander() -> tuple:
 
     switchVisualOutput(frontScreen)
     textSize(12)
-    fill(255)
+    fill(255, 255, 255)
     text(str(len(infos)), 10, 10)
     text(str(outSignal), canvas.width/2, 10)
     return tuple(infos)
@@ -112,7 +112,7 @@ def draw():
                     case 1:
                         switchVisualOutput(backScreen)
                         noStroke()
-                        fill(255)
+                        fill(255, 255, 255)
                         circle(x, y, bSize)
                     case -1:
                         switchVisualOutput(backScreen)
