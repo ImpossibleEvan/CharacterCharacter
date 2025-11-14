@@ -46,7 +46,7 @@ def networkHander() -> tuple:
             infos.append(msg)
 
         # Add own data
-        infos.append(f"{mouse.x};{mouse.y};{brushSize};{drew}; {' '.join(chars)}")
+        infos.append(f"{mouse.x};{mouse.y};{brushSize};{drew};`{' '.join(chars)}")
 
         outSignal = ';;'.join(infos)
 
@@ -59,7 +59,7 @@ def networkHander() -> tuple:
         for msg in data.split(';;'):
             infos.append(msg)
 
-        outSignal = f"{mouse.x};{mouse.y};{brushSize};{drew}; {' '.join(chars)}"
+        outSignal = f"{mouse.x};{mouse.y};{brushSize};{drew};`{' '.join(chars)}"
 
         client.send(outSignal)
 
@@ -95,7 +95,7 @@ def draw():
         if info != "":
             try:
                 x, y, bSize, drewReceived = map(int, info.split(";")[0:4])
-                chrs = ''.join(list(info.split(";")[4]))
+                chrs = ''.join(list(info.split(";")[4]))[:-1]
                 for c in chrs:
                     if c != '':
                         switchVisualOutput(backScreen)
