@@ -88,20 +88,20 @@ def draw():
             drew = -1
 
     # Handle networking.
-    infos = networkHander()    
+    infos:list[str] = networkHander()    
 
     # Process all received infos.
     for info in infos:
         if info != "":
             try:
                 x, y, bSize, drewReceived = map(int, info.split(";")[0:4])
-                chrs = info.split(";")[4].split(' ')
+                chrs = ''.join(list(info.split(";")[4]))
                 for c in chrs:
                     if c != '':
                         switchVisualOutput(backScreen)
                         textSize(bSize*2)
                         textAlign("center", "center")
-                        fill(255)
+                        fill(255, 255, 255)
                         text(c, x, y)
 
                 switchVisualOutput(frontScreen)
