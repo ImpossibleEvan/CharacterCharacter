@@ -94,8 +94,12 @@ def draw():
     for info in infos:
         if info != "":
             try:
-                x, y, bSize, drewReceived = map(int, info.split(";")[0:4])
-                chrs = ''.join(list(info.split(";")[4]))[:-1]
+                args = info.split(";")
+                x = int(args[0])
+                y = int(args[1])
+                bSize = int(args[2])
+                drewReceived = int(args[3])
+                chrs = args[4].removeprefix('`')
                 for c in chrs:
                     if c != '':
                         switchVisualOutput(backScreen)
