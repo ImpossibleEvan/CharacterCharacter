@@ -91,16 +91,11 @@ def draw():
     infos:list[str] = networkHander()    
 
     # Process all received infos.
-    for i, info in enumerate(infos):
+    for info in infos:
         if info != "":
             try:
-                text(str(info), canvas.width/2, 25 + (i*15))
-                args = info.split(";")
-                x = int(args[0])
-                y = int(args[1])
-                bSize = int(args[2])
-                drewReceived = int(args[3])
-                chrs = args[4].removeprefix('`')
+                x, y, bSize, drewReceived = map(int, info.split(";")[0:4])
+                chrs = ''.join(list(info.split(";")[4]))[1:] if len(info.split(";")) > 4 else ''
                 for c in chrs:
                     if c != '':
                         switchVisualOutput(backScreen)
