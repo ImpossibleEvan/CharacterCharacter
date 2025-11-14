@@ -29,6 +29,7 @@ drew:int = 0
 chars = ''
 
 def networkHander() -> tuple:
+    global brushSize, drew, chars
     # Clients send their data in the form of "x;y;brushSize;drew;chars"
     # Servers receive from all clients and send back all data of every player in a longer string seperated double ';' (';;')
     # Clients receive this long string and parse it.
