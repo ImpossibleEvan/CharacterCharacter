@@ -47,6 +47,8 @@ def networkHander() -> tuple:
 
         # Add own data
         infos.append(f"{mouse.x};{mouse.y};{brushSize};{drew};`{chars}")
+        chars = ''  # Reset own chars after sending
+        drew = 0    # Reset own drew after sending
 
         outSignal = ';;'.join(infos)
 
@@ -60,6 +62,8 @@ def networkHander() -> tuple:
             infos.append(msg)
 
         outSignal = f"{mouse.x};{mouse.y};{brushSize};{drew};`{chars}"
+        chars = ''  # Reset own chars after sending
+        drew = 0    # Reset own drew after sending
 
         client.send(outSignal)
 
