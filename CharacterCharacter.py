@@ -40,6 +40,7 @@ def networkHander() -> tuple:
         "drew": drew,
         "chars": chars
     })
+    
     # reset after preparing
     chars = ''
     drew = 0
