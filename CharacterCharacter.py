@@ -100,8 +100,8 @@ def draw():
     for info in infos:
         if info != "":
             try:
-                x, y, bSize, drewReceived = map(int, info.split(";")[0:4])
-                chrs = ''.join(list(info.split(";")[4]))[1:] if len(info.split(";")) > 4 else ''
+                x, y, bSize, drewReceived = info["x"], info["y"], info["brush"], info["drew"]
+                chrs = info["chars"] if "chars" in info else ''
                 for c in chrs:
                     if c != '':
                         switchVisualOutput(backScreen)
@@ -131,7 +131,7 @@ def draw():
                 drew = 0
 
             except Exception as e:
-                print(infos)
+                print(e)
     else:
         pass
 
