@@ -1,6 +1,7 @@
 from Isopalia import *
 import server
 import client
+import json
 
 # Choose to be server or client, and set up networking.
 while True:
@@ -30,49 +31,49 @@ chars = ''
 
 def networkHander() -> tuple:
     global brushSize, drew, chars
-    # Clients send their data in the form of "x;y;brushSize;drew;chars"
-    # Servers receive from all clients and send back all data of every player in a longer string seperated double ';' (';;')
-    # Clients receive this long string and parse it.
-    # Return a tuple of all received infos, each just the data string originating from one client.
-
     infos = []
 
-    # If you are the server
+    out_msg = json.dumps({
+        "x": mouse.x,
+        "y": mouse.y,
+        "brush": brushSize,
+        "drew": drew,
+        "chars": chars
+    })
+    # reset after preparing
+    chars = ''
+    drew = 0
+
     if who == 's':
-        # Get all data from all clients
         data = server.checkAll()
-
-        # Add all client data to a list
+        # data is assumed to be dict of client_id -> json-string
         for msg in data.values():
-            infos.append(msg)
-
-        # Add own data
-        infos.append(f"{mouse.x};{mouse.y};{brushSize};{drew};`{chars}")
-        chars = ''  # Reset own chars after sending
-        drew = 0    # Reset own drew after sending
-
-        outSignal = ';;'.join(infos)
-
-        # Send everything to the clients
-        server.sendAll(outSignal)
+            if msg:
+                try:
+                    infos.append(json.loads(msg))
+                except:
+                    pass
+        # include server's own message object for clients
+        server.sendAll(out_msg)
+        infos.append(json.loads(out_msg))
     else:
         data = client.check()
+        if data:
+            for msg in data.split(';;'):
+                if msg:
+                    try:
+                        infos.append(json.loads(msg))
+                    except:
+                        pass
+        client.send(out_msg)
 
-        # Parse the long string into individual messages
-        for msg in data.split(';;'):
-            infos.append(msg)
-
-        outSignal = f"{mouse.x};{mouse.y};{brushSize};{drew};`{chars}"
-        chars = ''  # Reset own chars after sending
-        drew = 0    # Reset own drew after sending
-
-        client.send(outSignal)
-
+    # debug overlay unchanged
     switchVisualOutput(frontScreen)
     textSize(12)
     fill(255, 255, 255)
     text(str(len(infos)), 10, 10)
-    text(str(outSignal), canvas.width/2, 10)
+    text(str(out_msg), canvas.width/2, 10)
+
     return tuple(infos)
 
 def draw():
