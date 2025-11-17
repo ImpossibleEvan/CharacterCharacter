@@ -110,10 +110,6 @@ def draw():
                         fill(255, 255, 255)
                         text(c, x, y)
 
-                switchVisualOutput(frontScreen)
-                noFill()
-                stroke(255, 0, 0)
-                circle(x, y, bSize)
                 match drewReceived:
                     case 1:
                         switchVisualOutput(backScreen)
@@ -124,6 +120,11 @@ def draw():
                         switchVisualOutput(backScreen)
                         noStroke()
                         fill(0)
+                        circle(x, y, bSize)
+                    case 0:
+                        switchVisualOutput(frontScreen)
+                        noFill()
+                        stroke(255, 0, 0)
                         circle(x, y, bSize)
                 
                 # Reset after processing
