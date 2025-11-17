@@ -124,7 +124,7 @@ def draw():
                     case 0:
                         switchVisualOutput(frontScreen)
                         noFill()
-                        stroke(255, 0, 0)
+                        stroke(0, 255, 255)
                         circle(x, y, bSize)
                 
                 # Reset after processing
