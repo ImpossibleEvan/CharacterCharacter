@@ -49,6 +49,9 @@ def setup() -> None:
         except ConnectionRefusedError as e:
             print(f"Do not attempt connection until server is ready.")
             input("Press Enter to retry...")
+        except Exception as e:
+            print(f"Connection failed: {e}")
+            input("Press Enter to retry...")
 
     # ^^^ Must happen before starting the thread ^^^
 
