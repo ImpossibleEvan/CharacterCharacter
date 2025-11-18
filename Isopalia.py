@@ -1073,21 +1073,12 @@ current_prompt_channel:str = "default"
 current_prompt:str = ""
 prompt_input:str = ""
 screen_before_prompt:pygame.surface.Surface = None
-def startprompt(prompt:str = "Enter:", channel:str = "default") -> None:
+def startPrompt(prompt:str = "Enter:", channel:str = "default") -> None:
     """Prompts the user for input. Stores it in "prompt_output" when the user presses enter.
     Everything is paused during this time, and prompt_output can only be accessed on the next frame."""
     global prompting, current_prompt, prompt_input, _lastkey, current_prompt_channel, prompt_outputs, screen_before_prompt
-    prompting = True
-    current_prompt = prompt
-    current_prompt_channel = channel
-    prompt_input = ""
-    _lastkey = None  # Reset last key to avoid confusion with the prompt input.
-    screen_before_prompt = canvas.screen.copy()  # Save the current screen before prompting.
-
-def startprompt(prompt:str = "Enter:", channel:str = "default") -> None:
-    """Prompts the user for input. Stores it in "prompt_output" when the user presses enter.
-    Everything is paused during this time, and prompt_output can only be accessed on the next frame."""
-    global prompting, current_prompt, prompt_input, _lastkey, current_prompt_channel, prompt_outputs, screen_before_prompt
+    
+    switchVisualOutput(canvas.screen) # Switch back to default visual output to avoid issues.
     prompting = True
     current_prompt = prompt
     current_prompt_channel = channel
