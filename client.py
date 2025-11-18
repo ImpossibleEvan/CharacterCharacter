@@ -43,7 +43,7 @@ def setup() -> None:
     # Connect to the server (replace with the server's IP address)
     while True:
         try:
-            clientSocket.connect((input("Enter server IP address: "), int("5000" or input("Enter server port: "))))
+            clientSocket.connect((input("Enter server IP address: "), int(input("Enter server port: ") or "5000")))
             print("Connected to the server.")
             break
         except ConnectionRefusedError as e:
