@@ -1,5 +1,6 @@
 import socket
 import time
+import requests
 
 message = "" # thing sent
 data = "" # thing received
@@ -29,7 +30,10 @@ def main() -> None:
     # Print IP for others
     hostname = socket.gethostname()
     ip_address = socket.gethostbyname(hostname)
-    print(f"Server IP address: {ip_address}")
+    
+    public_ip = requests.get("https://api.ipify.org").text
+    print(f"LAN IP address: {ip_address}")
+    print(f"Public IP address: {public_ip}")
 
     print("Server listening on port 5000...")
 

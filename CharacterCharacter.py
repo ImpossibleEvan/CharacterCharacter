@@ -1,7 +1,7 @@
 from Isopalia import *
 import TwoWay
 
-setup("CharacterCharacter")
+setup("CharacterCharacter", 800, 600)
 background(0)
 
 backScreen:pygame.Surface = pygame.Surface((canvas.width, canvas.height))
